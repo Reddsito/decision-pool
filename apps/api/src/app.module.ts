@@ -1,10 +1,20 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
+import { envConfig } from './config/env-config';
+import { validationEnvSchema } from './config/env-validation';
+import { PollsModule } from './modules/poll/polls.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      load: [envConfig],
+      cache: true,
+      isGlobal: true,
+      validationSchema: validationEnvSchema,
+    }),
+    PollsModule,
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
