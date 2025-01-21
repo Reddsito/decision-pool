@@ -8,7 +8,7 @@
     "docker:compose": "docker-compose up -d",
     "client:dev": "pnpm --filter './apps/web' dev",
     "server:dev": "wait-on tcp:6379 && pnpm --filter './apps/api' start:dev",
-    "start": "concurrently 'npm:docker:compose' 'npm:server:dev' 'npm:client:dev'"
+    "start": "NODE_ENV='development' concurrently 'pnpm:docker:compose' 'pnpm:server:dev' 'pnpm:client:dev'"
   },
   "keywords": [],
   "author": "",

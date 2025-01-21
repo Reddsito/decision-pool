@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.64.2",
     "bun": "^1.1.45",
     "nanoid": "^5.0.9",
     "next": "15.1.5",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@tanstack/eslint-plugin-query": "^5.64.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
