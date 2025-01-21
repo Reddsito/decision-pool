@@ -1,8 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { envConfig } from './config/env-config';
 import { validationEnvSchema } from './config/env-validation';
 import { PollsModule } from './modules/poll/polls.module';
+import { APP_PIPE } from '@nestjs/core';
+import { redisModule } from './modules/redis/redis.config.module';
 
 @Module({
   imports: [
@@ -13,8 +15,18 @@ import { PollsModule } from './modules/poll/polls.module';
       validationSchema: validationEnvSchema,
     }),
     PollsModule,
+    redisModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    },
+  ],
 })
 export class AppModule {}
