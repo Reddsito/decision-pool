@@ -4,6 +4,7 @@ import { envConfig } from './config/env-config';
 import { validationEnvSchema } from './config/env-validation';
 import { PollsModule } from './modules/poll/polls.module';
 import { APP_PIPE } from '@nestjs/core';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { APP_PIPE } from '@nestjs/core';
       validationSchema: validationEnvSchema,
     }),
     PollsModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [

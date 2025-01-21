@@ -7,4 +7,8 @@ export const envConfig = () => ({
     port: parseInt(process.env.REDIS_PORT, 10),
     ttl: parseInt(process.env.REDIS_TTL, 10),
   },
+  jwt: {
+    secret: process.env.JWT_SECRET,
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  },
 });

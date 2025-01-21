@@ -1,14 +1,17 @@
-import { Body, Controller, Logger, Post } from '@nestjs/common';
+import { Body, Controller, Logger, Post, UseGuards } from '@nestjs/common';
 import { PollsService } from './polls.service';
 import { CreatePollDto } from './dtos/create-poll.dto';
 import { JoinPollDto } from './dtos/join-poll.dto';
-import { ReJoinPollDto } from './dtos/re-join-poll.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { GetPayload } from '../auth/decorators/get-payload';
+import { AuthPayload } from '../auth/interfaces/auth-payload.interface';
 
 @Controller('polls')
 export class PollsController {
   logger = new Logger(PollsController.name);
   constructor(private readonly pollsService: PollsService) {}
 
+  @UseGuards()
   @Post()
   async create(@Body() createPollDto: CreatePollDto) {
     Logger.log('In create!');
@@ -23,10 +26,11 @@ export class PollsController {
     return result;
   }
 
+  @UseGuards(AuthGuard())
   @Post('/rejoin')
-  async rejoin(@Body() rejoinPollDto: ReJoinPollDto) {
+  async rejoin(@GetPayload() payload: AuthPayload) {
     Logger.log('In rejoin!');
-    const result = await this.pollsService.rejoin(rejoinPollDto);
+    const result = await this.pollsService.rejoin(payload);
     return result;
   }
 }
