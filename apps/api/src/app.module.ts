@@ -4,7 +4,6 @@ import { envConfig } from './config/env-config';
 import { validationEnvSchema } from './config/env-validation';
 import { PollsModule } from './modules/poll/polls.module';
 import { APP_PIPE } from '@nestjs/core';
-import { redisModule } from './modules/redis/redis.config.module';
 
 @Module({
   imports: [
@@ -15,7 +14,6 @@ import { redisModule } from './modules/redis/redis.config.module';
       validationSchema: validationEnvSchema,
     }),
     PollsModule,
-    redisModule,
   ],
   controllers: [],
   providers: [
