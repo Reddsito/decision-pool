@@ -1,5 +1,7 @@
-import { Logger, UseFilters } from '@nestjs/common';
+import { Logger, UseFilters, UseGuards } from '@nestjs/common';
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
@@ -12,6 +14,7 @@ import { WsExceptionFilter } from 'src/config/exceptions/exceptions.filter';
 import { WsUnauthorizedException } from 'src/config/exceptions/ws-exception';
 import { SocketWithAuth } from 'src/socket/types/socket-auth.type';
 import { PollsService } from './polls.service';
+import { GatewayAdminGuard } from '../auth/guards/gateaway-admin.guard';
 
 @UseFilters(WsExceptionFilter)
 @WebSocketGateway({
@@ -80,10 +83,28 @@ export class PollsGateway
       `Total clients connected to room '${roomName}': ${clientCount}`,
     );
 
-    // updatedPoll could be undefined if the the poll already started
-    // in this case, the socket is disconnect, but no the poll state
     if (updatedPoll) {
       this.io.to(pollID).emit('poll_updated', updatedPoll);
+    }
+  }
+
+  @UseGuards(GatewayAdminGuard)
+  @SubscribeMessage('remove_participant')
+  async removeParticipant(
+    @MessageBody('id') id: string,
+    @ConnectedSocket() client: SocketWithAuth,
+  ) {
+    this.logger.debug(
+      `Attempting to remove participant ${id} from poll ${client.pollID}`,
+    );
+
+    const updatedPoll = await this.pollsService.removeParticipant(
+      client.pollID,
+      id,
+    );
+
+    if (updatedPoll) {
+      this.io.to(client.pollID).emit('poll_updated', updatedPoll);
     }
   }
 

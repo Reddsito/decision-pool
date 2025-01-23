@@ -9,7 +9,11 @@ import {
 import { Response } from 'express';
 import { Socket } from 'socket.io';
 import { SocketWithAuth } from 'src/socket/types/socket-auth.type';
-import { WsBadRequestException, WsUnknownException } from './ws-exception';
+import {
+  WsBadRequestException,
+  WsTypeException,
+  WsUnknownException,
+} from './ws-exception';
 
 // Filtro para HttpException
 @Catch(HttpException)
@@ -44,6 +48,11 @@ export class WsExceptionFilter implements ExceptionFilter {
 
       const wsException = new WsBadRequestException(exceptionMessage);
       socket.emit('exception', wsException.getError());
+      return;
+    }
+
+    if (exception instanceof WsTypeException) {
+      socket.emit('exception', exception.getError());
       return;
     }
 
