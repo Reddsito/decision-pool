@@ -10,6 +10,11 @@ export type AddParticipantFields = {
   name: string;
 };
 
+export type RemoveParticipantFields = {
+  pollID: string;
+  userID: string;
+};
+
 export type RemoveParticipantData = {
   pollID: string;
   userID: string;

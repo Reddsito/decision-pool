@@ -16,7 +16,7 @@ async function bootstrap() {
   const port = parseInt(configService.get('PORT'));
   const clientPort = parseInt(configService.get('CLIENT_PORT'));
 
-  app.useGlobalFilters(new HttpExceptionFilter(), new GeneralExceptionFilter());
+  app.useGlobalFilters(new GeneralExceptionFilter(), new HttpExceptionFilter());
 
   app.enableCors({
     origin: [

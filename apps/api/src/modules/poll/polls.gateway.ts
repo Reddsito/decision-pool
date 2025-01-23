@@ -1,4 +1,10 @@
-import { Logger, UseFilters, UseGuards } from '@nestjs/common';
+import {
+  Logger,
+  UseFilters,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -15,8 +21,16 @@ import { WsUnauthorizedException } from 'src/config/exceptions/ws-exception';
 import { SocketWithAuth } from 'src/socket/types/socket-auth.type';
 import { PollsService } from './polls.service';
 import { GatewayAdminGuard } from '../auth/guards/gateaway-admin.guard';
+import { CreateNominationDto } from './dtos/create-nomination.dto';
 
 @UseFilters(WsExceptionFilter)
+@UsePipes(
+  new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  }),
+)
 @WebSocketGateway({
   namespace: 'polls',
 })
@@ -69,10 +83,10 @@ export class PollsGateway
     const sockets = this.io.sockets;
 
     const { pollID, userID } = client;
-    const updatedPoll = await this.pollsService.removeParticipant(
+    const updatedPoll = await this.pollsService.removeParticipant({
       pollID,
       userID,
-    );
+    });
 
     const roomName = client.pollID;
     const clientCount = this.io.adapter.rooms?.get(roomName)?.size ?? 0;
@@ -98,14 +112,32 @@ export class PollsGateway
       `Attempting to remove participant ${id} from poll ${client.pollID}`,
     );
 
-    const updatedPoll = await this.pollsService.removeParticipant(
-      client.pollID,
-      id,
-    );
+    const updatedPoll = await this.pollsService.removeParticipant({
+      pollID: client.pollID,
+      userID: id,
+    });
 
     if (updatedPoll) {
       this.io.to(client.pollID).emit('poll_updated', updatedPoll);
     }
+  }
+
+  @SubscribeMessage('nominate')
+  async nominate(
+    @MessageBody() nomination: CreateNominationDto,
+    @ConnectedSocket() client: SocketWithAuth,
+  ): Promise<void> {
+    this.logger.debug(
+      `Attempting to add nomination for user ${client.userID} to poll ${client.pollID}\n${nomination.text}`,
+    );
+
+    const updatedPoll = await this.pollsService.createNomination({
+      pollID: client.pollID,
+      userID: client.userID,
+      text: nomination.text,
+    });
+
+    this.io.to(client.pollID).emit('poll_updated', updatedPoll);
   }
 
   afterInit() {

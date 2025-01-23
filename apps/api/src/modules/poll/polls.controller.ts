@@ -22,7 +22,7 @@ export class PollsController {
   @Post('/join')
   async join(@Body() joinPollDto: JoinPollDto) {
     Logger.log('In join!');
-    const result = this.pollsService.join(joinPollDto);
+    const result = await this.pollsService.join(joinPollDto);
     return result;
   }
 

@@ -9,7 +9,11 @@ import { IORedisKey } from '../redis/redis.module';
 import Redis from 'ioredis';
 import { ConfigService } from '@nestjs/config';
 import { CreatePollData, Poll } from './types/poll.types';
-import { AddParticipantData } from './types/participant.types';
+import {
+  AddParticipantData,
+  RemoveParticipantData,
+} from './types/participant.types';
+import { AddNominationData } from './types/nominations.types';
 
 @Injectable()
 export class PollsRepository {
@@ -34,6 +38,7 @@ export class PollsRepository {
       id: pollID,
       votesPerVoter,
       participants: {},
+      nominations: {},
       adminID: userID,
       hasStarted: false,
     };
@@ -53,7 +58,7 @@ export class PollsRepository {
       this.logger.error(
         `Failed to add poll ${JSON.stringify(initialPoll)}\n${e}`,
       );
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException(`Failed to add poll ${pollID}`);
     }
   }
 
@@ -64,6 +69,8 @@ export class PollsRepository {
 
     try {
       const currentPoll = await this.getJSON(key);
+
+      console.log({ currentPoll });
 
       if (currentPoll === null) {
         throw new NotFoundException('Poll does not exist');
@@ -124,7 +131,10 @@ export class PollsRepository {
     }
   }
 
-  async removeParticipant(pollID: string, userID: string): Promise<Poll> {
+  async removeParticipant({
+    pollID,
+    userID,
+  }: RemoveParticipantData): Promise<Poll> {
     this.logger.log(`removing userID: ${userID} from poll: ${pollID}`);
 
     const key = `polls:${pollID}`;
@@ -139,7 +149,56 @@ export class PollsRepository {
         `Failed to remove userID: ${userID} from poll: ${pollID}`,
         e,
       );
-      throw new InternalServerErrorException('Failed to remove participant');
+      throw e;
+    }
+  }
+
+  async addNomination({
+    pollID,
+    nominationID,
+    nomination,
+  }: AddNominationData): Promise<Poll> {
+    this.logger.log(
+      `Adding nomination with nominationID: ${nominationID} to pollID: ${pollID}`,
+    );
+
+    const key = `polls:${pollID}`;
+    const nominationPath = `.nominations.${nominationID}`;
+
+    try {
+      await this.setJSONWithExpire(
+        key,
+        nomination,
+        parseInt(this.ttl),
+        nominationPath,
+      );
+
+      return this.getPoll(pollID);
+    } catch (e) {
+      this.logger.error(
+        `Failed to add nomination with nominationID: ${nominationID} to pollID: ${pollID}`,
+      );
+      throw e;
+    }
+  }
+
+  async removeNomination(pollID: string, nominationID: string): Promise<Poll> {
+    this.logger.log(
+      `Removing nomination with nominationID: ${nominationID} from pollID: ${pollID}`,
+    );
+
+    const key = `polls:${pollID}`;
+    const nominationPath = `.nominations.${nominationID}`;
+
+    try {
+      await this.deleteJson(key, nominationPath);
+
+      return this.getPoll(pollID);
+    } catch (e) {
+      this.logger.error(
+        `Failed to remove nomination with nominationID: ${nominationID} from pollID: ${pollID}`,
+      );
+      throw new InternalServerErrorException('Failed to remove nomination');
     }
   }
 
