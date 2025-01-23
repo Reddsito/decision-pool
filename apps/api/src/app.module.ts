@@ -5,8 +5,6 @@ import { validationEnvSchema } from './config/env-validation';
 import { PollsModule } from './modules/poll/polls.module';
 import { APP_PIPE } from '@nestjs/core';
 import { AuthModule } from './modules/auth/auth.module';
-import { PollsGateway } from './modules/poll/polls.gateway';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -28,7 +26,6 @@ import { PollsGateway } from './modules/poll/polls.gateway';
         transform: true,
       }),
     },
-    PollsGateway,
   ],
 })
 export class AppModule {}
