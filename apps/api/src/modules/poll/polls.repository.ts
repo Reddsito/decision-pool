@@ -8,9 +8,8 @@ import {
 import { IORedisKey } from '../redis/redis.module';
 import Redis from 'ioredis';
 import { ConfigService } from '@nestjs/config';
-import { CreatePollData } from './types/create-poll.type';
-import { Poll } from './types/poll.type';
-import { AddParticipantData } from './types/add-participant.type';
+import { CreatePollData, Poll } from './types/poll.types';
+import { AddParticipantData } from './types/participant.types';
 
 @Injectable()
 export class PollsRepository {

@@ -4,7 +4,7 @@ import { CreatePollDto } from './dtos/create-poll.dto';
 import { JoinPollDto } from './dtos/join-poll.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetPayload } from '../auth/decorators/get-payload';
-import { AuthPayload } from '../auth/interfaces/auth-payload.interface';
+import { AuthPayload } from '../auth/types/auth.types';
 
 @Controller('polls')
 export class PollsController {

@@ -1,13 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { createPollID, createUserID } from 'src/lib/utils';
-import { CreatePollFields } from './interfaces/create-poll.interface';
-import { JoinPollFields } from './interfaces/join-poll.interface';
-import { RejoinPollFields } from './interfaces/re-join.poll.interface';
+
 import { PollsRepository } from './polls.repository';
 import { JwtService } from '@nestjs/jwt';
-import { AddParticipantFields } from './interfaces/add-participant.interface';
-import { Poll } from './types/poll.type';
+import {
+  CreatePollFields,
+  JoinPollFields,
+  Poll,
+  RejoinPollFields,
+} from './types/poll.types';
+import { AddParticipantFields } from './types/participant.types';
 
 @Injectable()
 export class PollsService {
