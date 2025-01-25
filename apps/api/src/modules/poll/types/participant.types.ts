@@ -20,6 +20,12 @@ export type RemoveParticipantData = {
   userID: string;
 };
 
+export type AddParticipantRankingsData = {
+  pollID: string;
+  userID: string;
+  rankings: string[];
+};
+
 export type Participants = {
   [participantID: string]: string;
 };

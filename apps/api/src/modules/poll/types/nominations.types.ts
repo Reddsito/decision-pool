@@ -1,5 +1,5 @@
 export type Nominations = {
-  [nominationID: string]: string;
+  [nominationID: NominationID]: Nomination;
 };
 
 export type AddNominationFields = {
@@ -18,3 +18,5 @@ export type Nomination = {
   userID: string;
   text: string;
 };
+
+export type NominationID = string;

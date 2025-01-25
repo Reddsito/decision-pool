@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -11,9 +12,11 @@ import { ConfigService } from '@nestjs/config';
 import { CreatePollData, Poll } from './types/poll.types';
 import {
   AddParticipantData,
+  AddParticipantRankingsData,
   RemoveParticipantData,
 } from './types/participant.types';
 import { AddNominationData } from './types/nominations.types';
+import { Results } from './types/result.types';
 
 @Injectable()
 export class PollsRepository {
@@ -39,8 +42,10 @@ export class PollsRepository {
       votesPerVoter,
       participants: {},
       nominations: {},
+      rankings: {},
       adminID: userID,
       hasStarted: false,
+      hasFinished: false,
     };
 
     this.logger.log(
@@ -70,15 +75,9 @@ export class PollsRepository {
     try {
       const currentPoll = await this.getJSON(key);
 
-      console.log({ currentPoll });
-
       if (currentPoll === null) {
         throw new NotFoundException('Poll does not exist');
       }
-
-      // if (currentPoll?.hasStarted) {
-      //   throw new BadRequestException('The poll has already started');
-      // }
 
       return JSON.parse(currentPoll as string);
     } catch (e) {
@@ -202,9 +201,109 @@ export class PollsRepository {
     }
   }
 
+  async startPoll(pollID: string): Promise<Poll> {
+    this.logger.log(`Starting poll with pollID: ${pollID}`);
+
+    const key = `polls:${pollID}`;
+
+    try {
+      const currentPoll = await this.getPoll(pollID);
+
+      if (currentPoll.hasStarted) {
+        throw new ConflictException('Poll has already started');
+      }
+
+      await this.setJSONWithExpire(
+        key,
+        true,
+        parseInt(this.ttl),
+        '.hasStarted',
+      );
+
+      return this.getPoll(pollID);
+    } catch (e) {
+      this.logger.error(`Failed to start poll with pollID: ${pollID}`);
+      throw e;
+    }
+  }
+
+  async addParticipantRankings({
+    pollID,
+    userID,
+    rankings,
+  }: AddParticipantRankingsData): Promise<Poll> {
+    this.logger.log(
+      `Attempting to add rankings for userID/name: ${userID} to pollID: ${pollID}`,
+      rankings,
+    );
+
+    const key = `polls:${pollID}`;
+    const rankingsPath = `.rankings.${userID}`;
+
+    try {
+      await this.setJSONWithExpire(
+        key,
+        rankings,
+        parseInt(this.ttl),
+        rankingsPath,
+      );
+
+      return this.getPoll(pollID);
+    } catch (e) {
+      this.logger.error(
+        `Failed to add a rankings for userID/name: ${userID}/ to pollID: ${pollID}`,
+        rankings,
+      );
+      throw new InternalServerErrorException(
+        'There was an error starting the poll',
+      );
+    }
+  }
+
+  async addResults(pollID: string, results: Results): Promise<Poll> {
+    this.logger.log(`Adding results to poll with ID: ${pollID}`);
+
+    const key = `polls:${pollID}`;
+    const resultsPath = '.results';
+
+    try {
+      await this.setJSONWithExpire(
+        key,
+        results,
+        parseInt(this.ttl),
+        resultsPath,
+      );
+
+      await this.setJSONWithExpire(
+        key,
+        true,
+        parseInt(this.ttl),
+        '.hasFinished',
+      );
+
+      return this.getPoll(pollID);
+    } catch (e) {
+      this.logger.error(`Failed to add results to poll with ID: ${pollID}`);
+      throw e;
+    }
+  }
+
+  async deletePoll(pollID: string): Promise<void> {
+    this.logger.log(`Deleting poll with ID: ${pollID}`);
+
+    const key = `polls:${pollID}`;
+
+    try {
+      await this.deleteJson(key);
+    } catch (e) {
+      this.logger.error(`Failed to delete poll with ID: ${pollID}`);
+      throw e;
+    }
+  }
+
   private setJSONWithExpire(
     key: string,
-    value: object,
+    value: object | boolean,
     ttl: number,
     path: string = '.',
   ) {
@@ -225,7 +324,7 @@ export class PollsRepository {
     return object;
   }
 
-  private deleteJson(key: string, path: string) {
+  private deleteJson(key: string, path: string = '.') {
     const object = this.redisClient.call('JSON.DEL', [key, path]);
     return object;
   }

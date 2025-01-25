@@ -1,5 +1,7 @@
 import { Nominations } from './nominations.types';
 import { Participants } from './participant.types';
+import { Rankings } from './ranking.types';
+import { Results } from './result.types';
 
 export type CreatePollData = {
   topic: string;
@@ -43,7 +45,8 @@ export type Poll = {
   participants: Participants;
   adminID: string;
   nominations: Nominations;
-  // rankings: Rankings;
-  // results: Results;
+  rankings: Rankings;
+  results?: Results;
   hasStarted: boolean;
+  hasFinished: boolean;
 };
