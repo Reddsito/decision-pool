@@ -1,17 +1,26 @@
-import { AppPage } from "@/types/enums";
-import { AppState } from "@/types/types";
+import { AppState, initialAppState } from "@/types/types";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 type Actions = {
-	setPage: (page: AppPage) => void;
+	startLoading: () => void;
+	stopLoading: () => void;
+	setAccessToken: (accessToken: string) => void;
 };
 
-const usePageStore = create(
-	devtools<AppState & Actions>((set) => ({
-		currentPage: AppPage.Welcome,
-		setPage: (page: AppPage) => set({ currentPage: page }),
+type AppStateStore = {
+	isLoading: boolean;
+	accessToken: string;
+} & Actions;
+
+const useAppStore = create(
+	devtools<AppStateStore>((set) => ({
+		isLoading: initialAppState.isLoading,
+		accessToken: initialAppState.accessToken,
+		startLoading: () => set({ isLoading: true }),
+		stopLoading: () => set({ isLoading: false }),
+		setAccessToken: (accessToken) => set({ accessToken }),
 	})),
 );
 
-export default usePageStore;
+export default useAppStore;

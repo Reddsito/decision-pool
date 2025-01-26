@@ -29,7 +29,7 @@ export default function RootLayout({
 			lang="en"
 			suppressHydrationWarning>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased bg-color`}>
+				className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-color`}>
 				<Providers>{children}</Providers>
 			</body>
 		</html>

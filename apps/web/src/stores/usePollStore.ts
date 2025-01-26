@@ -1,9 +1,20 @@
-// import { create } from "zustand";
+import { initialPollState, Poll } from "@/types/types";
+import { create } from "zustand";
+import { devtools } from "zustand/middleware";
 
-// const usePollStore = create((set) => ({
-// 	polls: [],
-// 	addPoll: (poll) => set((state) => ({ polls: [...state.polls, poll] })),
-// 	removePoll: (poll) =>
-// 		set((state) => ({ polls: state.polls.filter((p) => p.id !== poll.id) })),
-// }));
-// export default usePollStore;
+type Actions = {
+	setPoll: (poll: Poll) => void;
+};
+
+type PollStore = {
+	poll: Poll;
+} & Actions;
+
+const usePollStore = create(
+	devtools<PollStore>((set) => ({
+		poll: initialPollState,
+		setPoll: (poll: Poll) => set({ poll }),
+	})),
+);
+
+export default usePollStore;

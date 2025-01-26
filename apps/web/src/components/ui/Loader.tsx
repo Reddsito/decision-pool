@@ -1,4 +1,4 @@
-import classes from "./Loader.module.css";
+import classes from "../../styles/Loader.module.css";
 
 type LoaderProps = {
 	color: "blue" | "orange" | "purple";
@@ -13,36 +13,16 @@ const colorStyles = {
 };
 
 const Loader: React.FC<LoaderProps> = ({ color, isLoading, width = 80 }) => {
-	const colorStyle = colorStyles[color] || "bg-purple";
-
-	const d = width / 7;
-
-	const left1 = d;
-	const left2 = 3 * d;
-	const left3 = 5 * d;
-
-	const dotStyles = { width: d, height: d, top: d };
-
-	return isLoading ? (
-		<div className={classes.overlay}>
-			<div
-				className={classes.ldsEllipsis}
-				style={{ height: 3 * d, width }}>
-				<div
-					className={colorStyle}
-					style={{ ...dotStyles, left: left1 }}></div>
-				<div
-					className={colorStyle}
-					style={{ ...dotStyles, left: left1 }}></div>
-				<div
-					className={colorStyle}
-					style={{ ...dotStyles, left: left2 }}></div>
-				<div
-					className={colorStyle}
-					style={{ ...dotStyles, left: left3 }}></div>
+	return (
+		<div className={`${classes.overlay} ${isLoading ? classes.active : ""}`}>
+			<div className={`${classes.loading_wave}`}>
+				<div className={`${classes.loading_bar} bg-color-bar`}></div>
+				<div className={`${classes.loading_bar} bg-color-bar`}></div>
+				<div className={`${classes.loading_bar} bg-color-bar`}></div>
+				<div className={`${classes.loading_bar} bg-color-bar`}></div>
 			</div>
 		</div>
-	) : null;
+	);
 };
 
 export default Loader;
