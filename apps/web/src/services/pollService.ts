@@ -1,5 +1,5 @@
 import httpClient from "@/lib/http-client";
-import { CreatePollData, Poll } from "@/types/types";
+import { CreatePollData, JoinPollData, Poll } from "@/types/types";
 
 type CreatePollResponse = {
 	poll: Poll;
@@ -12,6 +12,21 @@ export const createPoll = async (
 	const response = await httpClient<CreatePollResponse>("polls", {
 		method: "POST",
 		body: JSON.stringify(data),
+	});
+
+	return response;
+};
+
+type JoinPollResponse = {
+	poll: Poll;
+	accessToken: string;
+};
+
+export const joinPoll = async ({ pollID, name, signal }: JoinPollData) => {
+	const response = await httpClient<JoinPollResponse>("polls/join", {
+		method: "POST",
+		body: JSON.stringify({ pollID, name }),
+		signal,
 	});
 
 	return response;

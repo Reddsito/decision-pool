@@ -16,16 +16,23 @@ export function Providers({ children }: { children: React.ReactNode }) {
 			<TransitionRouter
 				auto={true}
 				leave={(next) => {
+					// Página actual se mueve hacia arriba
 					setAnimationClass("page-leave");
 					setTimeout(() => {
-						next(); // Continúa a la siguiente página después de la animación
-						setAnimationClass(""); // Resetea la clase
-					}, 200); // Tiempo de la animación
+						next(); // Continúa con la transición
+					}, 400); // Duración de la animación de salida
 				}}
 				enter={(next) => {
-					setAnimationClass("page-enter");
-					next();
-					setAnimationClass("");
+					// Nueva página inicia desde abajo y sube
+					setAnimationClass("page-enter-active");
+					setTimeout(() => {
+						setAnimationClass("page-enter");
+					}, 10); // Pequeño retraso para activar la transición
+
+					setTimeout(() => {
+						setAnimationClass(""); // Limpia las clases después de la animación
+						next();
+					}, 700); // Duración de la animación de entrada
 				}}>
 				<main className={`page ${animationClass}`}>{children}</main>
 				<ToastContainer

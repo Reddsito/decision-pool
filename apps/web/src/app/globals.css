@@ -27,15 +27,21 @@
 		right: 0px;
 		width: 100%;
 		height: 100%;
-		transition: transform 0.2s ease-in-out;
+		transform: translateY(0); /* Estado inicial */
 	}
 
 	.page-leave {
-		transform: translateY(-100%);
+		transition: transform 0.4s ease-in-out;
+		transform: translateY(-100%); /* Se mueve hacia arriba */
 	}
 
 	.page-enter {
-		transform: translateY(100%);
+		transition: transform 0.4s ease-in-out;
+		transform: translateY(0%); /* Inicia desde abajo */
+	}
+
+	.page-enter-active {
+		transform: translateY(200%); /* Se mueve a su posición final */
 	}
 
 	.pulsate {

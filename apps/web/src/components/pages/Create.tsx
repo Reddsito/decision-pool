@@ -1,14 +1,13 @@
 "use client";
-import { useState } from "react";
 import InputField from "../InputField";
 import Label from "../Label";
 import CountSelector from "../ui/CounterSelector";
-import { Link, useTransitionRouter } from "next-transition-router";
+import { Link } from "next-transition-router";
 import { BsArrowLeftShort } from "react-icons/bs";
-import pollSchema from "@/schemas/pollSchema";
+import { createPollSchema } from "@/schemas/pollSchema";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCreatePoll } from "@/hooks/usePolls";
+import usePoll from "@/hooks/usePolls";
 import useAppStore from "@/stores/usePageStore";
 
 const CreatePoll = () => {
@@ -18,13 +17,15 @@ const CreatePoll = () => {
 		formState: { errors },
 		control,
 	} = useForm({
-		resolver: zodResolver(pollSchema),
+		resolver: zodResolver(createPollSchema),
 		defaultValues: {
 			votesPerParticipant: 1,
 		},
 	});
 
-	const { mutate, isPending, isSuccess } = useCreatePoll();
+	const {
+		useCreatePoll: { mutate, isPending },
+	} = usePoll();
 	const startLoading = useAppStore((state) => state.startLoading);
 
 	const onSubmit = (data: any) => {

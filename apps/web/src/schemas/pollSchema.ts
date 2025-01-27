@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const pollSchema = z.object({
+const createPollSchema = z.object({
 	pollTopic: z
 		.string()
 		.min(1, "Poll topic is required")
@@ -9,4 +9,9 @@ const pollSchema = z.object({
 	name: z.string().min(1, "Name is required").max(50, "Name is too long"),
 });
 
-export default pollSchema;
+const joinPollSchema = z.object({
+	name: z.string().min(1, "Name is required").max(50, "Name is too long"),
+	pollID: z.string().length(6),
+});
+
+export { createPollSchema, joinPollSchema };

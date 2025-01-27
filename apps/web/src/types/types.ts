@@ -9,6 +9,17 @@ export interface CreatePollData {
 	name: string;
 }
 
+export interface JoinPollFields {
+	pollID: string;
+	name: string;
+}
+
+export interface JoinPollData {
+	pollID: string;
+	name: string;
+	signal?: AbortSignal;
+}
+
 export interface ApiError {
 	message: string | string[];
 	statusCode: number;
