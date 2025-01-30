@@ -5,7 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/query-client";
 import { ToastContainer, Zoom } from "react-toastify";
 import Loader from "@/components/ui/Loader";
-import useAppStore from "@/stores/usePageStore";
+import useAppStore from "@/stores/useAppStore";
 
 export function Providers({ children }: { children: React.ReactNode }) {
 	const [animationClass, setAnimationClass] = useState<string>("");
@@ -20,7 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 					setAnimationClass("page-leave");
 					setTimeout(() => {
 						next(); // Continúa con la transición
-					}, 400); // Duración de la animación de salida
+					}, 250); // Duración de la animación de salida
 				}}
 				enter={(next) => {
 					// Nueva página inicia desde abajo y sube

@@ -1,9 +1,19 @@
 "use client";
+import useAppStore from "@/stores/useAppStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Welcome() {
+	const me = useAppStore((state) => state.me);
+	const poll = useAppStore((state) => state.poll);
 	const router = useRouter();
+
+	useEffect(() => {
+		if (me()?.id && !poll?.hasStarted) {
+			router.push("/waiting-room");
+		}
+	}, [me()?.id, poll?.hasStarted]);
 
 	return (
 		<div className="flex flex-col justify-center items-center h-screen ">

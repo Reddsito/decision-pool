@@ -1,3 +1,4 @@
+import { use } from "react";
 import { toast, Zoom } from "react-toastify";
 
 const toastConfig = {
@@ -11,11 +12,17 @@ const toastConfig = {
 	transition: Zoom,
 };
 
-export const showSuccessToast = (message: string) => {
+const useToast = () => {
+	return { showSuccessToast, showErrorToast };
+};
+
+const showSuccessToast = (message: string) => {
 	toast.success(message, toastConfig);
 };
 
-export const showErrorToast = (error: Error | string) => {
+const showErrorToast = (error: Error | string) => {
 	const errorMessage = error instanceof Error ? error.message : error;
 	toast.error(errorMessage, toastConfig);
 };
+
+export default useToast;

@@ -64,11 +64,6 @@ export type Poll = {
 	hasFinished: boolean;
 };
 
-export const initialAppState = {
-	isLoading: false,
-	accessToken: "",
-};
-
 export const initialPollState = {
 	id: "",
 	topic: "",
@@ -80,4 +75,15 @@ export const initialPollState = {
 	results: undefined,
 	hasStarted: false,
 	hasFinished: false,
+};
+
+export const initialAppState = {
+	isLoading: false,
+	accessToken: "",
+	poll: initialPollState,
+};
+
+export type Me = {
+	id: string;
+	name: string;
 };

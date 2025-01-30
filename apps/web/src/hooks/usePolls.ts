@@ -1,17 +1,17 @@
 "use client";
 import { createPoll, joinPoll } from "@/services/pollService";
-import useAppStore from "@/stores/usePageStore";
-import usePollStore from "@/stores/usePollStore";
+import useAppStore from "@/stores/useAppStore";
 import { useMutation } from "@tanstack/react-query";
 import { useTransitionRouter } from "next-transition-router";
-import { showErrorToast, showSuccessToast } from "./useToast";
 import { JoinPollFields } from "@/types/types";
 import { useRef } from "react";
+import useToast from "./useToast";
 
 const usePoll = () => {
-	const setPoll = usePollStore((state) => state.setPoll);
+	const setPoll = useAppStore((state) => state.setPoll);
 	const setAccessToken = useAppStore((state) => state.setAccessToken);
 	const stopLoading = useAppStore((state) => state.stopLoading);
+	const { showErrorToast, showSuccessToast } = useToast();
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const router = useTransitionRouter();
 

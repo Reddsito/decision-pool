@@ -6,7 +6,9 @@ import usePoll from "@/hooks/usePolls";
 import { useForm } from "react-hook-form";
 import { Link } from "next-transition-router";
 import { BsArrowLeftShort } from "react-icons/bs";
-import useAppStore from "@/stores/usePageStore";
+import useAppStore from "@/stores/useAppStore";
+import { use, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const JoinPoll = () => {
 	const {
@@ -29,6 +31,15 @@ const JoinPoll = () => {
 			pollID: data.pollID.toUpperCase(),
 		});
 	};
+	const me = useAppStore((state) => state.me);
+	const poll = useAppStore((state) => state.poll);
+	const router = useRouter();
+
+	useEffect(() => {
+		if (me()?.id && !poll?.hasStarted) {
+			router.push("/waiting-room");
+		}
+	}, [me()?.id, poll?.hasStarted]);
 
 	return (
 		<div className="flex flex-col w-full justify-around items-stretch h-full mx-auto max-w-md">
@@ -71,7 +82,7 @@ const JoinPoll = () => {
 									: "opacity-100 cursor-pointer"
 							}`}
 							disabled={isPending}>
-							Create
+							Join
 						</button>
 					</div>
 				</form>

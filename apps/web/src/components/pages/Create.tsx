@@ -8,7 +8,9 @@ import { createPollSchema } from "@/schemas/pollSchema";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import usePoll from "@/hooks/usePolls";
-import useAppStore from "@/stores/usePageStore";
+import useAppStore from "@/stores/useAppStore";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const CreatePoll = () => {
 	const {
@@ -36,6 +38,16 @@ const CreatePoll = () => {
 			topic: data.pollTopic,
 		});
 	};
+
+	const me = useAppStore((state) => state.me);
+	const poll = useAppStore((state) => state.poll);
+	const router = useRouter();
+
+	useEffect(() => {
+		if (me()?.id && !poll?.hasStarted) {
+			router.push("/waiting-room");
+		}
+	}, [me()?.id, poll?.hasStarted]);
 
 	return (
 		<div className="flex flex-col w-full justify-around items-stretch h-full mx-auto max-w-md">
