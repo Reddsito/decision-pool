@@ -5,13 +5,13 @@ export const colorizeText = (text: string): JSX.Element[] =>
 		return val.charCodeAt(0) >= 48 && val.charCodeAt(0) <= 57 ? (
 			<span
 				key={index}
-				className="text-orange-600">
+				className="text-red-700">
 				{val}
 			</span>
 		) : (
 			<span
 				key={index}
-				className="text-indigo-600">
+				className="text-orange-600">
 				{val}
 			</span>
 		);

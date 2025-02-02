@@ -27,7 +27,9 @@ export interface ApiError {
 }
 
 export type Participants = {
-	[participantID: string]: string;
+	[participantID: string]: {
+		name: string;
+	};
 };
 
 export type NominationID = string;

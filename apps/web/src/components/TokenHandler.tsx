@@ -3,6 +3,7 @@
 import useToast from "@/hooks/useToast";
 import { getTokenPayload } from "@/lib/utils";
 import useAppStore from "@/stores/useAppStore";
+import { useTransitionRouter } from "next-transition-router";
 import { useEffect } from "react";
 
 const TokenHandler = () => {
@@ -11,7 +12,12 @@ const TokenHandler = () => {
 	const startLoading = useAppStore((state) => state.startLoading);
 	const setAccessToken = useAppStore((state) => state.setAccessToken);
 	const initializeSocket = useAppStore((state) => state.initializeSocket);
+	const me = useAppStore((state) => state.me);
+	const leavePoll = useAppStore((state) => state.leavePool);
+	const participants = useAppStore((state) => state.poll?.participants);
+	const socket = useAppStore((state) => state.socket);
 	const { showErrorToast } = useToast();
+	const router = useTransitionRouter();
 
 	useEffect(() => {
 		startLoading();
@@ -32,6 +38,16 @@ const TokenHandler = () => {
 		setAccessToken(accessToken);
 		initializeSocket(showErrorToast);
 	}, []);
+
+	useEffect(() => {
+		const myId = me()?.id;
+
+		if (socket?.connected && myId && !participants?.[myId]) {
+			localStorage.removeItem("accessToken");
+			leavePoll();
+			router.push("/");
+		}
+	}, [participants]);
 
 	return null;
 };

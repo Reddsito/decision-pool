@@ -19,6 +19,11 @@ type Actions = {
 	removeNomination: (nominationID: string) => void;
 	removeParticipant: (participantID: string) => void;
 	startVotes: () => void;
+	isAdmin: () => boolean;
+	nominationCount: () => number;
+	participantCount: () => number;
+	canStartVotes: () => boolean;
+	setOpen: (isOpen: boolean) => void;
 };
 
 export type AppStateStore = {
@@ -26,6 +31,7 @@ export type AppStateStore = {
 	accessToken?: string;
 	poll?: Poll;
 	socket?: Socket;
+	isOpen: boolean;
 } & Actions;
 
 const useAppStore = create(
@@ -34,6 +40,14 @@ const useAppStore = create(
 		accessToken: undefined,
 		poll: undefined,
 		socket: undefined,
+		isOpen: false,
+		setOpen: (isOpen) => set({ isOpen }),
+		nominationCount: () => Object.keys(get().poll?.nominations || {}).length,
+		participantCount: () => Object.keys(get().poll?.participants || {}).length,
+		canStartVotes: () => {
+			const votesPerVoter = get().poll?.votesPerVoter ?? 100;
+			return get().nominationCount() >= votesPerVoter;
+		},
 		startLoading: () => set({ isLoading: true }),
 		stopLoading: () => set({ isLoading: false }),
 		setAccessToken: (accessToken) => set({ accessToken }),
@@ -50,26 +64,36 @@ const useAppStore = create(
 						showErrorToast,
 					}),
 				});
-			} else {
-				get().socket?.connect();
+
+				return;
+			}
+
+			if (!socket.connected) {
+				socket?.connect();
+				return;
 			}
 		},
 		nominate: (message: string) => {
 			get().socket?.emit("nominate", { text: message });
+			set({ isOpen: false });
 		},
 		removeNomination: (nominationID: string) => {
 			get().socket?.emit("remove_nomination", { id: nominationID });
+			set({ isOpen: false });
 		},
 		removeParticipant: (participantID: string) => {
 			get().socket?.emit("remove_participant", { id: participantID });
+			set({ isOpen: false });
 		},
 		startVotes: () => {
 			get().socket?.emit("start_poll");
+			set({ isOpen: false });
 		},
 		leavePool: () => {
 			get().socket?.disconnect();
 			set({ poll: undefined, socket: undefined, accessToken: undefined });
 			localStorage.removeItem("accessToken");
+			set({ isOpen: false });
 		},
 		me: () => {
 			const accessToken = get().accessToken;
@@ -81,21 +105,20 @@ const useAppStore = create(
 			const token = getTokenPayload(accessToken);
 			return { id: token.sub, name: token.name };
 		},
+		isAdmin: () => {
+			const accessToken = get().accessToken;
+			const poll = get().poll;
+
+			if (!accessToken || !poll) return false;
+
+			const token = get().me();
+
+			if (!token) return false;
+
+			return token.id === poll.adminID;
+		},
 	})),
 );
-
-export const isAdmin = (state: AppStateStore) => {
-	const accessToken = state.accessToken;
-	const poll = state.poll;
-
-	if (!accessToken || !poll) return false;
-
-	const token = state.me();
-
-	if (!token) return false;
-
-	return token.id === poll.adminID;
-};
 
 useAppStore.subscribe(({ accessToken }) => {
 	if (accessToken) {
