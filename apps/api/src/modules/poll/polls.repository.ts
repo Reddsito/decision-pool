@@ -17,6 +17,7 @@ import {
 } from './types/participant.types';
 import { AddNominationData } from './types/nominations.types';
 import { Results } from './types/result.types';
+import { WsBadRequestException } from 'src/config/exceptions/ws-exception';
 
 @Injectable()
 export class PollsRepository {
@@ -297,7 +298,7 @@ export class PollsRepository {
       await this.deleteJson(key);
     } catch (e) {
       this.logger.error(`Failed to delete poll with ID: ${pollID}`);
-      throw e;
+      throw new WsBadRequestException('Poll does not exist');
     }
   }
 

@@ -27,6 +27,7 @@ type Actions = {
 	cancellPoll: () => void;
 	hasVoted: () => boolean;
 	rankingsCount: () => number;
+	closePoll: () => void;
 };
 
 export type AppStateStore = {
@@ -59,6 +60,7 @@ const useAppStore = create(
 			set((state) => ({ poll: { ...state.poll, ...poll } })),
 		initializeSocket: (showErrorToast) => {
 			const socket = get().socket;
+			console.log(socket);
 			if (!socket) {
 				set({
 					socket: createSocketWithHandlers({
@@ -72,6 +74,7 @@ const useAppStore = create(
 			}
 
 			if (!socket.connected) {
+				console.log("Reconnecting socket");
 				socket?.connect();
 				return;
 			}
@@ -94,6 +97,10 @@ const useAppStore = create(
 		},
 		startVotes: () => {
 			get().socket?.emit("start_poll");
+			set({ isOpen: false });
+		},
+		closePoll: () => {
+			get().socket?.emit("close_poll");
 			set({ isOpen: false });
 		},
 		cancellPoll: () => {

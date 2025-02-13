@@ -83,6 +83,13 @@ export class PollsGateway
     const sockets = this.io.sockets;
 
     const { pollID, userID } = client;
+    const pollExists = await this.pollsService.get(pollID).catch(() => null);
+    if (!pollExists) {
+      this.logger.warn(
+        `Poll ${pollID} no existe. No se puede remover participante.`,
+      );
+      return;
+    }
     const updatedPoll = await this.pollsService.removeParticipant({
       pollID,
       userID,
@@ -185,7 +192,7 @@ export class PollsGateway
 
     await this.pollsService.cancelPoll(client.pollID);
 
-    this.io.to(client.pollID).emit('poll_deleted');
+    this.io.to(client.pollID).emit('delete_poll');
   }
 
   @SubscribeMessage('submit_rankings')

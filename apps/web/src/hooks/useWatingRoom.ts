@@ -15,6 +15,8 @@ const useWaitingRoom = () => {
 	const setOpen = useAppStore((state) => state.setOpen);
 	const initializeSocket = useAppStore((state) => state.initializeSocket);
 	const startVotes = useAppStore((state) => state.startVotes);
+	const hasVoted = useAppStore((state) => state.hasVoted);
+	const cancellPoll = useAppStore((state) => state.cancellPoll);
 
 	return {
 		poll,
@@ -31,6 +33,8 @@ const useWaitingRoom = () => {
 		setOpen,
 		initializeSocket,
 		startVotes,
+		hasVoted,
+		cancellPoll,
 	};
 };
 

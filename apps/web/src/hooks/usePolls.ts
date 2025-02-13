@@ -12,6 +12,7 @@ const usePoll = () => {
 	const setAccessToken = useAppStore((state) => state.setAccessToken);
 	const stopLoading = useAppStore((state) => state.stopLoading);
 	const { showErrorToast, showSuccessToast } = useToast();
+	const initializeSocket = useAppStore((state) => state.initializeSocket);
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const router = useTransitionRouter();
 
@@ -22,6 +23,7 @@ const usePoll = () => {
 			setAccessToken(accessToken);
 			setPoll(poll);
 			stopLoading();
+			initializeSocket(showErrorToast);
 			router.push("/waiting-room");
 		},
 		onError: (error) => {
@@ -51,6 +53,7 @@ const usePoll = () => {
 			setAccessToken(accessToken);
 			setPoll(poll);
 			stopLoading();
+			initializeSocket(showErrorToast);
 			router.push("/waiting-room");
 		},
 		onError: (error) => {

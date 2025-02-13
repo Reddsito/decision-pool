@@ -15,6 +15,7 @@ export default function Voting() {
 	const submitRankings = useAppStore((state) => state.submitRankings);
 	const isAdmin = useAppStore((state) => state.isAdmin);
 	const cancellPoll = useAppStore((state) => state.cancellPoll);
+	const hasVoted = useAppStore((state) => state.hasVoted);
 	const me = useAppStore((state) => state.me);
 	const router = useTransitionRouter();
 
@@ -38,8 +39,18 @@ export default function Voting() {
 	};
 
 	useEffect(() => {
-		console.log("hola");
-	}, []);
+		if (me()?.id && !poll?.hasStarted) {
+			router.push("/waiting-room");
+		}
+
+		if (me()?.id && hasVoted()) {
+			console.log(poll?.hasStarted);
+			router.push("/results");
+		}
+		if (!me()?.id) {
+			router.push("/");
+		}
+	}, [me()?.id, poll?.hasStarted, hasVoted]);
 
 	return (
 		<div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -86,7 +97,7 @@ export default function Voting() {
 								setConfirmCancel(true);
 								setOpen(true);
 							}}>
-							Cancel Poll
+							Cancell Poll
 						</button>
 					)}
 				</div>

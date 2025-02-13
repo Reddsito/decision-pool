@@ -1,70 +1,110 @@
 "use client";
 
+import ResultsList from "@/components/ResultLists";
+import ConfirmationDialog from "@/components/ui/ConfirmationDialog";
 import useAppStore from "@/stores/useAppStore";
-import { useState } from "react";
-import { BiX } from "react-icons/bi";
+import { useTransitionRouter } from "next-transition-router";
+import { use, useEffect, useState } from "react";
 
 const results = () => {
-	const results = [
-		{ candidate: "Los Alazanes", score: 2.3 },
-		{ candidate: "Papa's Tacos", score: 1.69 },
-		{ candidate: "In N Out Burger", score: 0.99 },
-		{ candidate: "Tacos Güero", score: 0.69 },
-		{ candidate: "Taco Bell", score: 0.3 },
-	];
 	const isAdmin = useAppStore((state) => state.isAdmin);
 	const participantCount = useAppStore((state) => state.participantCount);
 	const poll = useAppStore((state) => state.poll);
 	const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
 	const [isLeavePollOpen, setIsLeavePollOpen] = useState(false);
+	const rankingsCount = useAppStore((state) => state.rankingsCount);
+	const setOpen = useAppStore((state) => state.setOpen);
+	const closePoll = useAppStore((state) => state.closePoll);
+	const leavePoll = useAppStore((state) => state.leavePool);
+	const me = useAppStore((state) => state.me);
+	const hasVoted = useAppStore((state) => state.hasVoted);
+	const router = useTransitionRouter();
+
+	useEffect(() => {
+		if (me()?.id && !poll?.hasStarted) {
+			router.push("/waiting-room");
+		}
+
+		if (me()?.id && !hasVoted()) {
+			console.log(poll?.hasStarted);
+			router.push("/voting");
+		}
+
+		if (!me()?.id) {
+			router.push("/");
+		}
+	}, [me()?.id, poll?.hasStarted, hasVoted]);
 
 	return (
-		<div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-amber-50 to-red-100 p-4">
-			<div className="w-full max-w-md bg-white/80 backdrop-blur rounded-lg shadow-lg p-6 relative">
-				<button
-					className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-red-500 hover:from-amber-500 hover:to-red-600 text-white transition-colors"
-					aria-label="Close">
-					<BiX className="w-5 h-5" />
-				</button>
-
-				<div className="space-y-6">
-					<h1 className="text-2xl font-bold text-center text-gray-700">
-						Results
-					</h1>
-
-					<div className="space-y-1">
-						<div className="flex justify-between py-2 border-b-2 border-gray-200">
-							<span className="text-lg font-medium text-gray-600">
-								Candidate
-							</span>
-							<span className="text-lg font-medium text-gray-600">Score</span>
-						</div>
-
-						{results.map((result, index) => (
-							<div
-								key={index}
-								className={`flex justify-between py-3 border-b border-gray-100 ${
-									index === 0 ? "bg-gradient-to-r from-amber-50 to-red-50" : ""
-								}`}>
-								<span className="text-base text-gray-700">
-									{result.candidate}
-								</span>
-								<span
-									className={`text-base font-medium ${
-										index === 0 ? "text-amber-600" : "text-gray-600"
-									}`}>
-									{result.score.toFixed(2)}
-								</span>
-							</div>
-						))}
+		<>
+			{" "}
+			<div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-amber-50 to-red-100 p-4">
+				<div className="w-full max-w-md bg-white/80 backdrop-blur rounded-lg shadow-lg p-6 relative space-y-4">
+					<ResultsList
+						results={poll?.results!}
+						rankingsCount={rankingsCount()}
+						participantCount={participantCount()}
+					/>
+					<div className="space-y-8">
+						{isAdmin() && !poll?.results?.length && (
+							<button
+								className="w-full py-3 px-4 text-base font-medium text-white bg-gradient-to-r from-amber-400 to-red-500 hover:from-amber-500 hover:to-red-600 rounded-md shadow-md hover:shadow-lg transition-all duration-300 "
+								onClick={() => {
+									setIsConfirmationOpen(true);
+									setOpen(true);
+								}}>
+								End poll
+							</button>
+						)}
 					</div>
-
-					<button className="w-full py-2.5 px-4 text-base font-medium border-2 border-amber-300 hover:border-amber-400 hover:bg-amber-50 text-amber-700 rounded-lg transition-all duration-300">
-						Leave Poll
-					</button>
+					{!isAdmin() && !poll?.results?.length && (
+						<div className="my-2 italic">
+							Waiting for admin,{" "}
+							<span className="font-semibold">
+								{poll?.participants[poll.adminID].name}
+							</span>
+							, to end the poll.
+						</div>
+					)}
+					{!!poll?.results?.length && (
+						<button
+							className="w-full py-2.5 px-4 text-base font-medium border-2 border-amber-300 hover:border-amber-400 hover:bg-amber-50 text-amber-700 rounded-lg transition-all duration-300"
+							onClick={() => {
+								setIsLeavePollOpen(true);
+								setOpen(true);
+							}}>
+							Leave the poll
+						</button>
+					)}
 				</div>
 			</div>
-		</div>
+			<ConfirmationDialog
+				message="Are you sure you want to end the poll?"
+				showDialog={isConfirmationOpen}
+				onCancel={() => {
+					setIsConfirmationOpen(false);
+					setOpen(false);
+				}}
+				onConfirm={() => {
+					closePoll();
+					setOpen(false);
+					setIsConfirmationOpen(false);
+				}}
+			/>
+			<ConfirmationDialog
+				message="Are you sure you want to leave the poll?"
+				showDialog={isLeavePollOpen}
+				onCancel={() => {
+					setIsLeavePollOpen(false);
+					setOpen(false);
+				}}
+				onConfirm={() => {
+					leavePoll();
+					router.push("/");
+					setOpen(false);
+				}}
+			/>
+		</>
 	);
 };
 

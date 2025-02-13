@@ -34,13 +34,10 @@ const WaitingRoom = () => {
 		leavePool,
 		me,
 		setOpen,
-		initializeSocket,
 		startVotes,
+		hasVoted,
+		cancellPoll,
 	} = useWaitingRoom();
-
-	useEffect(() => {
-		initializeSocket(showErrorToast);
-	}, []);
 
 	const confirmRemoveParticipant = (id: string) => {
 		setConfirmationMessage(`Remove ${poll?.participants[id].name} from poll?`);
@@ -65,7 +62,13 @@ const WaitingRoom = () => {
 		if (me()?.id && poll?.hasStarted) {
 			router.push("/voting");
 		}
-	}, [me()?.id, poll?.hasStarted]);
+		if (me()?.id && hasVoted()) {
+			router.push("/results");
+		}
+		if (!me()?.id) {
+			router.push("/");
+		}
+	}, [me()?.id, poll?.hasStarted, hasVoted()]);
 
 	return (
 		<>
@@ -139,14 +142,26 @@ const WaitingRoom = () => {
 								to start the voting.
 							</div>
 						)}
-						<button
-							className="box btn-orange my-2 pulsate-finite"
-							onClick={() => {
-								setShowConfirmation(true);
-								setOpen(true);
-							}}>
-							Leave Poll
-						</button>
+
+						{isAdmin() ? (
+							<button
+								className="box btn-orange my-2 pulsate-finite"
+								onClick={() => {
+									setShowConfirmation(true);
+									setOpen(true);
+								}}>
+								Cancell poll
+							</button>
+						) : (
+							<button
+								className="box btn-orange my-2 pulsate-finite"
+								onClick={() => {
+									setShowConfirmation(true);
+									setOpen(true);
+								}}>
+								Leave poll
+							</button>
+						)}
 					</div>
 				</div>
 			</div>
@@ -193,7 +208,7 @@ const WaitingRoom = () => {
 					setOpen(false);
 				}}
 				onConfirm={() => {
-					leavePool();
+					isAdmin() ? cancellPoll() : leavePool();
 					setShowConfirmation(false);
 					router.push("/");
 				}}

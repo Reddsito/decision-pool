@@ -1,48 +1,27 @@
-// import React, { useState } from "react";
-// import { RoundResult } from "shared/poll-types";
+import { Results } from "@/types/types";
+import React, { useState } from "react";
 
-// type ResultCard = {
-// 	result: Readonly<RoundResult>;
-// };
+type ResultProps = {
+	candidate: string;
+	score: number;
+	index: number;
+};
 
-// const ResultCard: React.FC<ResultCard> = ({ result }) => {
-// 	const [showPercent, setShowPercent] = useState(false);
-// 	const totalVotes = result.totalVotes;
+const ResultCard = ({ candidate, score, index }: ResultProps) => {
+	return (
+		<div
+			className={`flex justify-between py-3 border-b border-gray-100 ${
+				index === 0 ? "bg-gradient-to-r from-amber-50 to-red-50" : ""
+			}`}>
+			<span className="text-base text-gray-700">{candidate}</span>
+			<span
+				className={`text-base font-medium ${
+					index === 0 ? "text-amber-600" : "text-gray-600"
+				}`}>
+				{score.toFixed(2)}
+			</span>
+		</div>
+	);
+};
 
-// 	return (
-// 		<>
-// 			<div className="grid grid-cols-3 gap-4 pb-2 my-2 border-b-2 border-solid border-purple-70 pr-4">
-// 				<div className="col-span-2 font-semibold">Candidate</div>
-// 				<div className="col-span-1 font-semibold text-right">
-// 					<button
-// 						onClick={() => setShowPercent(false)}
-// 						className={showPercent ? "" : "text-orange-700"}>
-// 						Count
-// 					</button>
-// 					{" / "}
-// 					<button
-// 						onClick={() => setShowPercent(true)}
-// 						className={showPercent ? "text-orange-700" : ""}>
-// 						%
-// 					</button>
-// 				</div>
-// 			</div>
-// 			<div className="divide-y-2 overflow-y-auto pr-4">
-// 				{result.votes.map((candidate) => (
-// 					<div
-// 						key={candidate.nominationID}
-// 						className="grid grid-cols-3 gap-4 my-1 items-center">
-// 						<div className="col-span-2">{candidate.text}</div>
-// 						<div className="col-span-1 text-right">
-// 							{showPercent
-// 								? ((candidate.count / totalVotes) * 100).toFixed(2)
-// 								: candidate.count}
-// 						</div>
-// 					</div>
-// 				))}
-// 			</div>
-// 		</>
-// 	);
-// };
-
-// export default ResultCard;
+export default ResultCard;

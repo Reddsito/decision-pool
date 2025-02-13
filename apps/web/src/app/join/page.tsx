@@ -22,6 +22,7 @@ const JoinPoll = () => {
 		useJoinPoll: { mutate, isPending },
 	} = usePoll();
 	const startLoading = useAppStore((state) => state.startLoading);
+	const hasVoted = useAppStore((state) => state.hasVoted);
 
 	const onSubmit = (data: any) => {
 		startLoading();
@@ -42,7 +43,11 @@ const JoinPoll = () => {
 		if (me()?.id && poll?.hasStarted) {
 			router.push("/voting");
 		}
-	}, [me()?.id, poll?.hasStarted]);
+
+		if (me()?.id && hasVoted()) {
+			router.push("/results");
+		}
+	}, [me()?.id, poll?.hasStarted, hasVoted()]);
 
 	return (
 		<div className="flex flex-col w-full justify-around items-stretch h-full mx-auto max-w-md">
