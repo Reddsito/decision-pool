@@ -46,6 +46,10 @@ const CreatePoll = () => {
 		if (me()?.id && !poll?.hasStarted) {
 			router.push("/waiting-room");
 		}
+
+		if (me()?.id && poll?.hasStarted) {
+			router.push("/voting");
+		}
 	}, [me()?.id, poll?.hasStarted]);
 
 	return (

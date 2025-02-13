@@ -46,6 +46,8 @@ const createTokenMiddleware =
     const token =
       socket.handshake.auth.token || socket.handshake.headers['token'];
 
+    console.log(socket.handshake);
+
     logger.debug(`Validating auth token before connection: ${token}`);
 
     try {

@@ -16,6 +16,7 @@ const TokenHandler = () => {
 	const leavePoll = useAppStore((state) => state.leavePool);
 	const participants = useAppStore((state) => state.poll?.participants);
 	const socket = useAppStore((state) => state.socket);
+	const hasVoted = useAppStore((state) => state.hasVoted);
 	const { showErrorToast } = useToast();
 	const router = useTransitionRouter();
 

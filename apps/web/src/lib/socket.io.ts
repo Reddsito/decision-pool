@@ -44,5 +44,10 @@ export const createSocketWithHandlers = ({
 		state.updatePoll(poll);
 	});
 
+	socket.on("delete_poll", (poll) => {
+		console.log('event: "poll_updated" received', poll);
+		state.updatePoll(poll);
+	});
+
 	return socket;
 };

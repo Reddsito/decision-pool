@@ -4,7 +4,6 @@ import { devtools } from "zustand/middleware";
 import { Socket } from "socket.io-client";
 import { getTokenPayload } from "@/lib/utils";
 import { createSocketWithHandlers, socketIOUrl } from "@/lib/socket.io";
-import { access } from "fs";
 
 type Actions = {
 	startLoading: () => void;
@@ -24,6 +23,10 @@ type Actions = {
 	participantCount: () => number;
 	canStartVotes: () => boolean;
 	setOpen: (isOpen: boolean) => void;
+	submitRankings: (rankings: string[]) => void;
+	cancellPoll: () => void;
+	hasVoted: () => boolean;
+	rankingsCount: () => number;
 };
 
 export type AppStateStore = {
@@ -85,8 +88,16 @@ const useAppStore = create(
 			get().socket?.emit("remove_participant", { id: participantID });
 			set({ isOpen: false });
 		},
+		submitRankings: (rankings: string[]) => {
+			get().socket?.emit("submit_rankings", { rankings });
+			set({ isOpen: false });
+		},
 		startVotes: () => {
 			get().socket?.emit("start_poll");
+			set({ isOpen: false });
+		},
+		cancellPoll: () => {
+			get().socket?.emit("delete_poll");
 			set({ isOpen: false });
 		},
 		leavePool: () => {
@@ -94,6 +105,15 @@ const useAppStore = create(
 			set({ poll: undefined, socket: undefined, accessToken: undefined });
 			localStorage.removeItem("accessToken");
 			set({ isOpen: false });
+		},
+		hasVoted: () => {
+			const rankings = get().poll?.rankings || {};
+			const id = get().me()?.id || "";
+
+			return rankings[id] !== undefined ? true : false;
+		},
+		rankingsCount: () => {
+			return Object.keys(get().poll?.rankings || {}).length;
 		},
 		me: () => {
 			const accessToken = get().accessToken;

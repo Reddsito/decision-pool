@@ -61,6 +61,12 @@ const WaitingRoom = () => {
 		}
 	};
 
+	useEffect(() => {
+		if (me()?.id && poll?.hasStarted) {
+			router.push("/voting");
+		}
+	}, [me()?.id, poll?.hasStarted]);
+
 	return (
 		<>
 			<div className="flex flex-col w-full justify-around items-stretch h-full mx-auto max-w-md">

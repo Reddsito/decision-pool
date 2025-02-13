@@ -24,9 +24,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
     const status = exception.getStatus();
-    const message = exception.message;
+    const message = exception.getResponse();
 
     this.logger.error(`HTTP Exception: ${message}`, exception.stack);
+
+    if (typeof message === 'object') {
+      response.status(status).json({
+        ...message,
+      });
+      return;
+    }
 
     response.status(status).json({
       statusCode: status,
@@ -74,14 +81,14 @@ export class GeneralExceptionFilter implements ExceptionFilter {
       const response = host.switchToHttp().getResponse<Response>();
       response.status(500).json({
         statusCode: 500,
-        message,
+        response: message,
         error: exception.name,
       });
     }
 
     if (host.getType() === 'ws') {
       const client = host.switchToWs().getClient<Socket>();
-      client.emit('error', { message, stack: exception.stack });
+      client.emit('error', { response: message, stack: exception.stack });
     }
   }
 }

@@ -7,13 +7,22 @@ import { useEffect } from "react";
 export default function Welcome() {
 	const me = useAppStore((state) => state.me);
 	const poll = useAppStore((state) => state.poll);
+	const hasVoted = useAppStore((state) => state.hasVoted);
 	const router = useTransitionRouter();
 
 	useEffect(() => {
 		if (me()?.id && !poll?.hasStarted) {
 			router.push("/waiting-room");
 		}
-	}, [me()?.id, poll?.hasStarted]);
+
+		if (me()?.id && poll?.hasStarted) {
+			router.push("/voting");
+		}
+
+		if (me()?.id && hasVoted()) {
+			router.push("/results");
+		}
+	}, [me()?.id, poll?.hasStarted, hasVoted()]);
 
 	return (
 		<div className="flex flex-col justify-center items-center h-screen ">
