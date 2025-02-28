@@ -57,7 +57,7 @@ const JoinPoll = () => {
 					onSubmit={handleSubmit(onSubmit)}>
 					<Link
 						href="/"
-						className="absolute top-2 left-2 p-2 text-amber-600 hover:text-red-600 transition-colors">
+						className="w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-red-500 hover:from-amber-500 hover:to-red-600 text-white transition-colors absolute top-4 left-4">
 						<BsArrowLeftShort className="w-9 h-9" />
 					</Link>
 					<h2 className="text-3xl text-center font-bold bg-gradient-to-r from-amber-500 to-red-500 bg-clip-text text-transparent ">

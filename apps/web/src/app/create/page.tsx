@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import usePoll from "@/hooks/usePolls";
 import useAppStore from "@/stores/useAppStore";
 import { useEffect } from "react";
+import { BiChevronLeft } from "react-icons/bi";
 
 const CreatePoll = () => {
 	const {
@@ -64,9 +65,10 @@ const CreatePoll = () => {
 					className="space-y-4"
 					onSubmit={handleSubmit(onSubmit)}>
 					<Link
-						href="/"
-						className="absolute top-2 left-2 p-2 text-amber-600 hover:text-red-600 transition-colors">
-						<BsArrowLeftShort className="w-9 h-9" />
+						className="w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-red-500 hover:from-amber-500 hover:to-red-600 text-white transition-colors absolute top-4 left-4"
+						aria-label="Go back"
+						href={"/"}>
+						<BiChevronLeft className="w-6 h-6" />
 					</Link>
 					<h2 className="text-3xl text-center font-bold bg-gradient-to-r from-amber-500 to-red-500 bg-clip-text text-transparent ">
 						Create a Poll

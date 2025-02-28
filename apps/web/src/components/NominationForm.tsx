@@ -42,7 +42,7 @@ const NominationForm: React.FC<NominationFormProps> = ({
 				<div className="space-y-4 w-full">
 					<div className="flex items-center justify-around relative w-full">
 						<button
-							className="p-2 text-amber-600 hover:text-red-600 transition-colors absolute left-0"
+							className="w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-red-500 hover:from-amber-500 hover:to-red-600 text-white transition-colors absolute top-0 left-0"
 							aria-label="Go back"
 							onClick={onClose}>
 							<BiChevronLeft className="w-6 h-6" />
